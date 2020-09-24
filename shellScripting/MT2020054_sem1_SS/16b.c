@@ -17,12 +17,15 @@ void main(int argc, char **argv, char **argp){
     lock.l_len = 0;
     lock.l_pid = getpid();
 
-    int fd = open("trash/16dummy.txt", O_RDONLY);
+    int fd = open("trash/16dummy.txt", O_RDWR);
     if(fd == -1){
         printf("%s\n",strerror(errno));
     }
     printf("Program starting read locking...\n");
-    fcntl(fd, F_SETLK, &lock);
+    int retval = fcntl(fd, F_SETLKW, &lock);
+    if(retval == -1){
+        printf("%s\n",strerror(errno));
+    }
     printf("Inside critical section executing...\n");
     printf("Press a Enter to finish...\n");
     getchar();

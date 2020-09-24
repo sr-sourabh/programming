@@ -22,7 +22,10 @@ void main(int argc, char **argv, char **argp){
         printf("%s\n",strerror(errno));
     }
     printf("Program starting write lock...\n");
-    fcntl(fd, F_SETLKW, &lock);
+    int retval = fcntl(fd, F_SETLKW, &lock);
+    if(retval == -1){
+        printf("%s\n",strerror(errno));
+    }
     printf("Inside critical section executing...\n");
     printf("Press a Enter to finish...\n");
     getchar();

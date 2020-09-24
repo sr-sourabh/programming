@@ -1,0 +1,3 @@
+struct ticketReservation{
+    int number;
+};
