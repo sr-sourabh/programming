@@ -71,3 +71,7 @@ void main(){
     }
 
 }
+
+//shell commands :  ln
+//                  mkfifo
+//ls -il
