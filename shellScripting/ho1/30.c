@@ -23,16 +23,15 @@ void main(int argc, char **argv, char **argp){
         umask(0); //permission with 0744
 
         struct tm time_to_execute;
-        time_to_execute.tm_hour = 16;
+        time_to_execute.tm_hour = 18;
 
-        struct tm *time_now;
-        time_t t;
-        time(&t);
-        time_now = localtime(&t);
-
-        int sleep_time = 1800; //give 86400 to sleep for 24 hours
+        int sleep_time = 600; //give 86400 to sleep for 24 hours
 
         while(1){
+            struct tm *time_now;
+            time_t t;
+            time(&t);
+            time_now = localtime(&t);
             if(time_now->tm_hour == time_to_execute.tm_hour ){
                 int pid = fork();
                 if(!pid){
