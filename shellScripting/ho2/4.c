@@ -16,6 +16,11 @@
 #include<signal.h>
 #include<sys/time.h>
 
+/*
+Write a program to measure how much time is taken to execute 100 getppid ( )
+system call. Use time stamp counter.
+*/
+
 unsigned long long help(){
     unsigned long long t;
     __asm__ __volatile__("rdtsc" : "=A"(t));

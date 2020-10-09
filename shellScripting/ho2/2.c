@@ -16,6 +16,9 @@
 #include<signal.h>
 #include<sys/time.h>
 
+/*
+Write a program to print the system resource limits. Use getrlimit system call.
+*/
 
 void main(int argc, char **argv, char **argp){
 

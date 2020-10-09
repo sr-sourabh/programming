@@ -18,19 +18,19 @@
 #include<pthread.h>
 
 /*
-Write a simple program to create three threads.
+Write a simple program to create a pipe, write to the pipe, read from pipe and display on
+the monitor.
 */
 
-void *hello(void *arg ){
-    printf("Hello %d \n", *(int*)arg);
-}
 void main(int argc, char **argv, char **argp){
-    pthread_t pthread;
-    for(int i = 0 ; i < 3 ; ++i){
-        int status = pthread_create(&pthread, NULL, hello, (void*)&i);
-        if(status == -1){
-            printf("%s\n",strerror(errno));
-        }
-    }
-    pthread_exit(NULL);
+    int fd[2];
+    pipe(fd);
+
+    write(fd[1], "Hello\n", 6);
+    char buff[6];
+    read(fd[0], buff, 6);
+    printf("Read: %s", buff);
+
+    close(fd[0]);
+    close(fd[1]);
 }

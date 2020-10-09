@@ -16,6 +16,9 @@
 #include<signal.h>
 #include<sys/time.h>
 
+/*
+Write a program to set (any one) system resource limit. Use setrlimit system call.
+*/
 
 void main(int argc, char **argv, char **argp){
 

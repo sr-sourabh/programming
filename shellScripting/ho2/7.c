@@ -17,6 +17,10 @@
 #include<sys/time.h>
 #include<pthread.h>
 
+/*
+Write a simple program to print the created thread ids.
+*/
+
 void *hello(void *arg ){
     printf("Thread %d 's id: %ld \n", *(int*)arg, pthread_self());
 }

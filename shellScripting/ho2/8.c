@@ -17,6 +17,17 @@
 #include<sys/time.h>
 #include<pthread.h>
 
+/*
+Write a separate program using signal system call to catch the following signals.
+a. SIGSEGV
+b. SIGINT
+c. SIGFPE
+d. SIGALRM (use alarm system call)
+e. SIGALRM (use setitimer system call)
+f. SIGVTALRM (use setitimer system call)
+g. SIGPROF (use setitimer system call)
+*/
+
 void handler(int sigid){
     switch(sigid){
         case SIGSEGV : printf("SIGSEGV handled\n"); exit(0); break;

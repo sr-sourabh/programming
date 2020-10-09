@@ -16,6 +16,13 @@
 #include<signal.h>
 #include<sys/time.h>
 
+/*
+Write a separate program (for each time domain) to set a interval timer in 10sec and
+10micro second
+a. ITIMER_REAL
+b. ITIMER_VIRTUAL
+c. ITIMER_PROF
+*/
 
 void main(int argc, char **argv, char **argp){
 

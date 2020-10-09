@@ -17,6 +17,10 @@
 #include<sys/time.h>
 #include<pthread.h>
 
+/*
+Write a program to ignore a SIGINT signal then reset the default action of the SIGINT signal -
+use sigaction system call.
+*/
 
 void main(int argc, char **argv, char **argp){
     struct sigaction newAction;

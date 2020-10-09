@@ -17,11 +17,17 @@
 #include<sys/time.h>
 #include<pthread.h>
 
+/*
+Write a program to create an orphan process. Use kill system call to send SIGKILL signal to
+the parent process from the child process.
+*/
 
 void main(int argc, char **argv, char **argp){
     if(!fork()){
-        printf("Child executing with pid: %d...\nKilling parent...\n", getpid());
+        printf("Child executing with pid: %d...\nKilling parent with ppid: %d\n", getpid(), getppid());
         kill(getppid(), SIGKILL);
+        sleep(1);
+        printf("Parent id after killing: %d\n", getppid());
         sleep(10);
     }
     else{
