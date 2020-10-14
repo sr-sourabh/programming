@@ -18,6 +18,7 @@
 #include<pthread.h>
 #include<sys/msg.h>
 #include<sys/ipc.h>
+#include<sys/shm.h>
 
 /*
 30. Write a program to create a shared memory.
@@ -29,5 +30,29 @@ d. remove the shared memory
 
 void main(int argc, char **argv, char **argp){
 
+    int shmid;
+    int key;
+    key = ftok("./24.c", 123);
+    printf("Creating shared memory...\n");
+    shmid = shmget(key, 64, IPC_CREAT|0644);
+    printf("Done...\n");
+    printf("Attaching shared memory...\n");
+    char *data = shmat(shmid, 0, 0);
+    printf("Done...\n");
+
+    printf("Enter some data: ");
+    scanf("%s", data);
+
+    char * newdata = shmat(shmid, 0, SHM_RDONLY);
+    printf("Data from shared memory: %s\n", newdata);
+
+    printf("Deattaching shared memory...\n");
+    shmdt((void *)newdata);
+    printf("Done...\n");
+
+    printf("Destroying shared memory...\n");
+    shmctl(shmid, IPC_RMID, NULL);
+    printf("Done...\n");
 
 }
+//ipcs -m
