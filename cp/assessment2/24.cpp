@@ -1,6 +1,15 @@
 /*
-Author : Shourabh Payal
-24. Implement an efficient algorithm to compute the longest common sub-string of two strings.
+    Author : Shourabh Payal
+
+    Implement an efficient algorithm to compute the longest common sub-string of two strings.
+    Idea :
+        We will implement Rabin Karp algorithm which takes 2 strings and a variable length L.
+        It finds out if a sub string of length L exists between the 2 strings.
+        This will take θ(N+M) if a good hashing function is used.
+        Here N and M is the size of the 2 strings.
+        We will use Binary search to find the correct maximum length of the substring.
+        This will take O(min(N,M))
+        Total time complexity in average case : θ( (N+M) log(min(M,N)) )
 */
 #include<iostream>
 #include<string.h>
