@@ -46,7 +46,7 @@ void main(int argc, char **argv, char **argp){
     lock.l_type = F_WRLCK;
     lock.l_whence = SEEK_SET;
     lock.l_start = sizes[choice-1];
-    lock.l_len = sizes[choice];
+    lock.l_len = sizes[choice]-sizes[choice-1];
     lock.l_pid = getpid();
 
     printf("Starting...\n");

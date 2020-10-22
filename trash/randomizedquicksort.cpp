@@ -16,7 +16,7 @@ int partition(int a[], int l, int r){
 	cout<<"Pivot val: "<<pivVal<<endl;
 	for(int i = 0 ; i < 10; i++) cout<<a[i]<<" ";
 	cout<<endl;
-	while(i < j){
+	while(i <= j){
 		while(a[i] <= pivVal && (i <= j)) i++;
 		while(a[j] > pivVal && (i <= j))j--;
 		if(i < j){
