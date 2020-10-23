@@ -29,9 +29,9 @@ void main(int argc, char **argv, char **argp){
     printSchedulerName();
 
     struct sched_param sh;
-    sh.sched_priority = 11;
+    sh.sched_priority = 0;
     printf("Changing scheduler to FIFO\nChanging scheduler priority to: %d\n",sh.sched_priority);
-    int status = sched_setscheduler(getpid(), SCHED_FIFO, &sh);
+    int status = sched_setscheduler(getpid(), SCHED_BATCH, &sh);
     if(status == -1){
         printf("%s\n",strerror(errno));
     }
@@ -43,4 +43,3 @@ void main(int argc, char **argv, char **argp){
     printf("Get schd attribute status: %d\n", sched_getparam(getpid(), &sh));
     printf("Priority obtained using sched_getparam: %d\n", sh.sched_priority);
 }
-//why is priority coming as 0?

@@ -39,7 +39,7 @@ void main(int argc, char **argv, char **argp){
         int sd, nsd, clientLen;
         char buff[50];
 
-        sd = socket(AF_INET, SOCK_STREAM, 0);
+        sd = socket(AF_INET, SOCK_STREAM, 0); //domain, type, protocol
         server.sin_family = AF_INET;
         server.sin_addr.s_addr = INADDR_ANY;
         server.sin_port = htons(5555);
@@ -87,6 +87,7 @@ void main(int argc, char **argv, char **argp){
         printf("Enter a message: \n");
         scanf("%s", buff);
         write(sd, buff, sizeof(buff));
+        close(sd);
     }
 
 }

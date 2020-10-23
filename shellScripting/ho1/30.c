@@ -23,9 +23,9 @@ void main(int argc, char **argv, char **argp){
         umask(0); //permission with 0744
 
         struct tm time_to_execute;
-        time_to_execute.tm_hour = 18;
+        time_to_execute.tm_hour = 19;
 
-        int sleep_time = 600; //give 86400 to sleep for 24 hours
+        int sleep_time = 10; //give 86400 to sleep for 24 hours
 
         while(1){
             struct tm *time_now;

@@ -1,0 +1,1 @@
+char invalidCredentials[] = "INVALID_CREDENTIALS";
