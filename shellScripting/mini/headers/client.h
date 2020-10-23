@@ -8,11 +8,85 @@ char incorrectCredentialsMsg[] = "Credentials entered are incorrect...\n";
 
 
 void handleNormalUser(int sd){
+    char buff[200];
+    char userId[20];
+    char password[20];
 
+    read(sd, buff, sizeof(buff));
+    printf("%s", buff);
+    read(sd, buff, sizeof(buff));
+    printf("%s", buff);
+    scanf("%s", userId);
+    write(sd, userId, sizeof userId);
+
+    read(sd, buff, sizeof(buff));
+    printf("%s", buff);
+    scanf("%s", password);
+    write(sd, password, sizeof password);
+
+    //Waiting for authorization
+    read(sd, buff, sizeof buff);
+    if(strcmp(invalidCredentials, buff) == 0 || strcmp(notFound, buff) == 0){
+        printf("%s\n", invalidCredentials);
+        return;
+    }
+    else{
+        printf("Login successful...\n");
+    }
+
+    char choice[1] = "9";
+    while(choice[0] != '6'){
+        //Read and display admin menu received from server
+        SYNC;
+        read(sd, buff, sizeof buff);
+        printf("%s", buff);
+        scanf("%s", choice);
+        //send choice to server
+        write(sd, choice, sizeof choice);
+        SYNC;
+        if(choice[0] == '1'){
+            printf("\n********** Deposit Menu **********\n");
+            printf("Enter the amount to be deposited:\n");
+            int amount;
+            scanf("%d", &amount);
+            write(sd, &amount, sizeof amount);
+            printf("Amount deposited \n");
+        }
+        else if(choice[0] == '2'){
+            printf("\n********** Withdraw Menu **********\n");
+            printf("Enter the amount to be withdrawn:\n");
+            int amount;
+            scanf("%d", &amount);
+            write(sd, &amount, sizeof amount);
+            printf("Amount withdrawn \n");
+        }
+        else if(choice[0] == '3'){
+            int balance;
+            read(sd, &balance, sizeof balance);
+            printf("\nAvailable balance is: %d\n", balance);
+        }
+        else if(choice[0] == '4'){
+            printf("\n********** Password change Menu **********\n");
+            printf("Enter the new password:\n");
+            char passwd[20];
+            scanf("%s", passwd);
+            write(sd, &passwd, sizeof passwd);
+            printf("Password changed \n");
+        }
+        else if(choice[0] == '5'){
+            struct user u;
+            read(sd, &u, sizeof u);
+            printf("\nUserId: %s\n", u.userId);
+            printf("Username: %s\n", u.userName);
+            printf("Password: %s\n", u.password);
+            printf("Balance: %d\n", u.balance);
+            printf("Type: %d\n", u.type);
+        }
+    }
 }
 
 void handleJointUser(int sd){
-
+    
 }
 
 void adminAdd(int sd){

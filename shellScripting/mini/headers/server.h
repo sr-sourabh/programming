@@ -3,10 +3,14 @@
 #include "user.h"
 char menuMsg[] = "Welcome\n1.Admin\n2.Joint Account\n3.Normal Account\n4.Exit\nEnter your choice: ";
 char connectedMsg[] = "Connected to server...\n\n";
+
 char adminLoginMsg[] = "\nAdmin Login\n";
 char userIdMsg[] = "User Id: ";
 char passwordMsg[] = "Password: ";
 char adminMenuMsg[] = "\n1.Add User\n2.Delete User\n3.Modify User\n4.Search User\n5.Exit\nEnter your choice: ";
+
+char normalUserLoginMsg[] = "\nNormal User Login\n";
+char normalMenuMsg[] = "\n1.Deposit\n2.Withdraw\n3.View Balance\n4.Change Password\n5.View Details\n6.Exit\nEnter your choice: ";
 
 int sleepSync = 0.01;
 #define SYNC sleep(sleepSync)
@@ -171,7 +175,81 @@ void handleJointUser(int nsd){
 }
 
 void handleNormalUser(int nsd){
+    char userId[20];
+    char password[20];
 
+    write(nsd, normalUserLoginMsg, sizeof normalUserLoginMsg);
+    SYNC;
+    write(nsd, userIdMsg, sizeof userIdMsg);
+    read(nsd, userId, sizeof(userId));
+    write(nsd, passwordMsg, sizeof passwordMsg);
+    read(nsd, password, sizeof(password));
+
+    char *filepath = malloc(strlen("db/") + strlen(userId) + 1);
+    strcpy(filepath, "db/");
+    strcat(filepath, userId);
+    int userFd = open(filepath, O_RDWR);
+    if(userFd == -1){
+        printf("%s\n",strerror(errno));
+        write(nsd, notFound, sizeof notFound);
+        close(userFd);
+        free(filepath);
+        return;
+    }
+
+    lseek(userFd, 0, SEEK_SET);
+    struct user u;
+    read(userFd, &u, sizeof(struct user));
+    if(strcmp(password, u.password) != 0){
+        write(nsd, invalidCredentials, sizeof invalidCredentials);
+        close(userFd);
+        free(filepath);
+        return;
+    }
+    //else write success to client
+    write(nsd, success, sizeof success);
+    char choice[1] = "9";
+    while(choice[0] != '6'){
+        SYNC;
+        write(nsd, normalMenuMsg, sizeof normalMenuMsg);
+        //Read the choice from client
+        read(nsd, choice, sizeof choice);
+        SYNC;
+        if(choice[0] == '1'){
+            int amount;
+            read(nsd, &amount, sizeof amount);
+            u.balance += amount;
+            lseek(userFd, 0, SEEK_SET);
+            write(userFd, &u, sizeof u);
+            printf("Amount deposited for: %s\n", userId);
+        }
+        else if(choice[0] == '2'){
+            int amount;
+            read(nsd, &amount, sizeof amount);
+            u.balance -= amount;
+            lseek(userFd, 0, SEEK_SET);
+            write(userFd, &u, sizeof u);
+            printf("Amount withdrawn for: %s\n", userId);
+        }
+        else if(choice[0] == '3'){
+            write(nsd, &u.balance, sizeof u.balance);
+            printf("\n");
+        }
+        else if(choice[0] == '4'){
+            char passwd[20];
+            read(nsd, &passwd, sizeof passwd);
+            memcpy(u.password, passwd, sizeof u.password);
+            lseek(userFd, 0, SEEK_SET);
+            write(userFd, &u, sizeof u);
+            printf("Password changed for: %s\n", userId);
+        }
+        else if(choice[0] == '5'){
+            write(nsd, &u, sizeof u);
+        }
+    }
+
+    close(userFd);
+    free(filepath);
 }
 
 void handleLogin(int nsd){
