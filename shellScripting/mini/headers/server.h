@@ -1,30 +1,110 @@
 #include "adminCredentials.h"
 #include "errors.h"
-
+#include "user.h"
 char menuMsg[] = "Welcome\n1.Admin\n2.Joint Account\n3.Normal Account\n4.Exit\nEnter your choice: ";
 char connectedMsg[] = "Connected to server...\n\n";
 char adminLoginMsg[] = "\nAdmin Login\n";
 char userIdMsg[] = "User Id: ";
-char passwordMsg[] = "Password:";
+char passwordMsg[] = "Password: ";
 char adminMenuMsg[] = "\n1.Add User\n2.Delete User\n3.Modify User\n4.Search User\n5.Exit\nEnter your choice: ";
 
 int sleepSync = 0.01;
 #define SYNC sleep(sleepSync)
 
 void adminAdd(int nsd){
+    struct user u;
+    read(nsd, &u, sizeof (struct user));
 
+    char *filepath = malloc(strlen("db/") + strlen(u.userId) + 1);
+    strcpy(filepath, "db/");
+    strcat(filepath, u.userId);
+    int fd = open(filepath, O_CREAT | O_EXCL | O_RDWR, 0644 );
+    if(fd == -1){
+        printf("%s\n",strerror(errno));
+        write(nsd, usernameNotUnique, sizeof usernameNotUnique);
+    }
+    else{
+        write(nsd, success, sizeof success);
+        read(nsd, &u, sizeof(struct user));
+        write(fd, &u, sizeof(struct user));
+        printf("UserId: %s added...\n", u.userId);
+    }
+    free(filepath);
+    close(fd);
 }
 
 void adminDelete(int nsd){
-
+    struct user u;
+    read(nsd, &u, sizeof u);
+    char *filepath = malloc(strlen("db/") + strlen(u.userId) + 1);
+    strcpy(filepath, "db/");
+    strcat(filepath, u.userId);
+    int fd = unlink(filepath);
+    if(fd == -1){
+        printf("%s\n",strerror(errno));
+        memcpy(u.userId, notFound, sizeof notFound);
+    }
+    else{
+        printf("UserId: %s deleted...\n", u.userId);
+    }
+    write(nsd, &u, sizeof u);
+    close(fd);
+    free(filepath);
 }
 
 void adminModify(int nsd){
+    struct user u;
 
+    read(nsd, &u, sizeof u);
+
+    char *filepath = malloc(strlen("db/") + strlen(u.userId) + 1);
+    strcpy(filepath, "db/");
+    strcat(filepath, u.userId);
+
+    int fd = open(filepath, O_RDWR);
+    if(fd == -1){
+        printf("%s\n",strerror(errno));
+        memcpy(u.userId, notFound, sizeof notFound);
+        write(nsd, &u, sizeof u);
+    }
+    else{
+        write(nsd, &u, sizeof u);
+        //Read the modified details coming in from client
+        read(nsd, &u, sizeof(struct user));
+        //Read existing details
+        lseek(fd, 0, SEEK_SET);
+        struct user existingU;
+        read(fd, &existingU, sizeof existingU);
+        u.type = existingU.type;
+        u.balance = existingU.balance;
+
+        //Write new values
+        lseek(fd, 0, SEEK_SET);
+        write(fd, &u, sizeof(struct user));
+        printf("UserId: %s modified...\n", u.userId);
+    }
+    close(fd);
+    free(filepath);
 }
 
 void adminSearch(int nsd){
-
+    struct user u;
+    read(nsd, &u, sizeof u);
+    char *filepath = malloc(strlen("db/") + strlen(u.userId) + 1);
+    strcpy(filepath, "db/");
+    strcat(filepath, u.userId);
+    int fd = open(filepath, O_RDONLY);
+    if(fd == -1){
+        printf("%s\n",strerror(errno));
+        memcpy(u.userId, notFound, sizeof notFound);
+    }
+    else{
+        lseek(fd, 0, SEEK_SET);
+        read(fd, &u, sizeof u);
+    }
+    write(nsd, &u, sizeof u);
+    close(fd);
+    free(filepath);
 }
 
 void handleAdminUser(int nsd){
@@ -67,6 +147,7 @@ void handleAdminUser(int nsd){
         write(nsd, adminMenuMsg, sizeof adminMenuMsg);
         //Read the choice from client
         read(nsd, choice, sizeof choice);
+        SYNC;
         if(choice[0] == '1'){
             adminAdd(nsd);
         }
