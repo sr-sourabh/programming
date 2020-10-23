@@ -12,6 +12,8 @@ char adminMenuMsg[] = "\n1.Add User\n2.Delete User\n3.Modify User\n4.Search User
 char normalUserLoginMsg[] = "\nNormal User Login\n";
 char normalMenuMsg[] = "\n1.Deposit\n2.Withdraw\n3.View Balance\n4.Change Password\n5.View Details\n6.Exit\nEnter your choice: ";
 
+char jointUserLoginMsg[] = "\nJoint User Login\n";
+
 int sleepSync = 0.01;
 #define SYNC sleep(sleepSync)
 
@@ -171,7 +173,178 @@ void handleAdminUser(int nsd){
 }
 
 void handleJointUser(int nsd){
+    char userId[20];
+    char password[20];
 
+    write(nsd, jointUserLoginMsg, sizeof jointUserLoginMsg);
+    SYNC;
+    write(nsd, userIdMsg, sizeof userIdMsg);
+    read(nsd, userId, sizeof(userId));
+    write(nsd, passwordMsg, sizeof passwordMsg);
+    read(nsd, password, sizeof(password));
+
+    char *filepath = malloc(strlen("db/") + strlen(userId) + 1);
+    strcpy(filepath, "db/");
+    strcat(filepath, userId);
+    int userFd = open(filepath, O_RDWR);
+    if(userFd == -1){
+        printf("%s\n",strerror(errno));
+        write(nsd, notFound, sizeof notFound);
+        close(userFd);
+        free(filepath);
+        return;
+    }
+
+    lseek(userFd, 0, SEEK_SET);
+    struct user u;
+    read(userFd, &u, sizeof(struct user));
+    if(strcmp(password, u.password) != 0 || (u.type != 2)){
+        write(nsd, invalidCredentials, sizeof invalidCredentials);
+        close(userFd);
+        free(filepath);
+        return;
+    }
+    //else write success to client
+    write(nsd, success, sizeof success);
+    char choice[1] = "9";
+    while(choice[0] != '6'){
+        close(userFd);
+        userFd = open(filepath, O_RDWR);
+        lseek(userFd, 0, SEEK_SET);
+        read(userFd, &u, sizeof(struct user));
+        SYNC;
+        write(nsd, normalMenuMsg, sizeof normalMenuMsg);
+        //Read the choice from client
+        read(nsd, choice, sizeof choice);
+        SYNC;
+        if(choice[0] == '1'){
+            int amount;
+
+            struct flock lock;
+            lock.l_type = F_WRLCK;
+            lock.l_whence = SEEK_SET;
+            lock.l_start = 0;
+            lock.l_len = sizeof(struct user);
+            lock.l_pid = getpid();
+
+            int retval = fcntl(userFd, F_SETLKW, &lock);
+            if(retval == -1){
+                printf("%s\n",strerror(errno));
+            }
+
+            lseek(userFd, 0, SEEK_SET);
+            read(userFd, &u, sizeof(struct user));
+
+            read(nsd, &amount, sizeof amount);
+
+            u.balance += amount;
+            lseek(userFd, 0, SEEK_SET);
+            write(userFd, &u, sizeof u);
+            printf("Amount deposited for: %s\n", userId);
+
+            lock.l_type = F_UNLCK;
+            fcntl(userFd, F_SETLK, &lock);
+        }
+        else if(choice[0] == '2'){
+            int amount;
+
+            struct flock lock;
+            lock.l_type = F_WRLCK;
+            lock.l_whence = SEEK_SET;
+            lock.l_start = 0;
+            lock.l_len = sizeof(struct user);
+            lock.l_pid = getpid();
+
+            int retval = fcntl(userFd, F_SETLKW, &lock);
+            if(retval == -1){
+                printf("%s\n",strerror(errno));
+            }
+
+            lseek(userFd, 0, SEEK_SET);
+            read(userFd, &u, sizeof(struct user));
+
+            read(nsd, &amount, sizeof amount);
+            u.balance -= amount;
+            lseek(userFd, 0, SEEK_SET);
+            write(userFd, &u, sizeof u);
+            printf("Amount withdrawn for: %s\n", userId);
+
+            lock.l_type = F_UNLCK;
+            fcntl(userFd, F_SETLK, &lock);
+        }
+        else if(choice[0] == '3'){
+            struct flock lock;
+            lock.l_type = F_RDLCK;
+            lock.l_whence = SEEK_SET;
+            lock.l_start = 0;
+            lock.l_len = sizeof(struct user);
+            lock.l_pid = getpid();
+
+            int retval = fcntl(userFd, F_SETLKW, &lock);
+            if(retval == -1){
+                printf("%s\n",strerror(errno));
+            }
+
+            lseek(userFd, 0, SEEK_SET);
+            read(userFd, &u, sizeof(struct user));
+
+            write(nsd, &u.balance, sizeof u.balance);
+            printf("\n");
+
+            lock.l_type = F_UNLCK;
+            fcntl(userFd, F_SETLK, &lock);
+        }
+        else if(choice[0] == '4'){
+            char passwd[20];
+            struct flock lock;
+            lock.l_type = F_WRLCK;
+            lock.l_whence = SEEK_SET;
+            lock.l_start = 0;
+            lock.l_len = sizeof(struct user);
+            lock.l_pid = getpid();
+
+            int retval = fcntl(userFd, F_SETLKW, &lock);
+            if(retval == -1){
+                printf("%s\n",strerror(errno));
+            }
+
+            lseek(userFd, 0, SEEK_SET);
+            read(userFd, &u, sizeof(struct user));
+
+            read(nsd, &passwd, sizeof passwd);
+            memcpy(u.password, passwd, sizeof u.password);
+            lseek(userFd, 0, SEEK_SET);
+            write(userFd, &u, sizeof u);
+            printf("Password changed for: %s\n", userId);
+
+            lock.l_type = F_UNLCK;
+            fcntl(userFd, F_SETLK, &lock);
+        }
+        else if(choice[0] == '5'){
+            struct flock lock;
+            lock.l_type = F_RDLCK;
+            lock.l_whence = SEEK_SET;
+            lock.l_start = 0;
+            lock.l_len = sizeof(struct user);
+            lock.l_pid = getpid();
+
+            int retval = fcntl(userFd, F_SETLKW, &lock);
+            if(retval == -1){
+                printf("%s\n",strerror(errno));
+            }
+
+            lseek(userFd, 0, SEEK_SET);
+            read(userFd, &u, sizeof(struct user));
+
+            write(nsd, &u, sizeof u);
+
+            lock.l_type = F_UNLCK;
+            fcntl(userFd, F_SETLK, &lock);
+        }
+    }
+
+    close(userFd);
+    free(filepath);
 }
 
 void handleNormalUser(int nsd){
@@ -200,7 +373,7 @@ void handleNormalUser(int nsd){
     lseek(userFd, 0, SEEK_SET);
     struct user u;
     read(userFd, &u, sizeof(struct user));
-    if(strcmp(password, u.password) != 0){
+    if(strcmp(password, u.password) != 0 || u.type != 1){
         write(nsd, invalidCredentials, sizeof invalidCredentials);
         close(userFd);
         free(filepath);
