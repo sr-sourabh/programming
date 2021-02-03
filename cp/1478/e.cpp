@@ -4,9 +4,9 @@ using namespace std;
 typedef long long ll;
 
 const int mysize = 200001;
-char s1[mysize], f1[mysize];
-int tree[4*mysize+1];
-int lazy[4*mysize+1];
+string s1, f1;
+ll tree[4*mysize+2];
+ll lazy[4*mysize+2];
 
 //count of 1s
 void buildtree(int index, int s, int e){
@@ -26,9 +26,13 @@ void buildtree(int index, int s, int e){
 void update(int index, int s, int e, int rs, int re, int val){
     if(s>e) return;
 
-    if(s==e){
-        tree[index] = val;
-        return;
+    if(lazy[index] != -1){
+        tree[index] = (lazy[index] == 1) ? (e-s+1) : 0;
+        if(s != e){
+            lazy[2*index+1] = lazy[index];
+            lazy[2*index] = lazy[index];
+        }
+        lazy[index] = -1;
     }
 
     if(e < rs || s > re) return;
@@ -52,7 +56,7 @@ void update(int index, int s, int e, int rs, int re, int val){
 }
 
 //range query
-int query(int index, int s, int e, int qs, int qe){
+ll query(int index, int s, int e, int qs, int qe){
     if(s>e) return 0;
 
     if(e<qs || s > qe) return 0;
@@ -77,43 +81,59 @@ int main(){
     ios::sync_with_stdio(0);
     cin.tie(0);
 
-    int t; scanf("%d", &t);
+    int t; cin>>t;
     while(t--){
-        int n; scanf("%d", &n);
-        int q; scanf("%d", &q);
+        int n; cin>>n;
+        int q; cin>>q;
         int a[q], b[q];
-        scanf("%s", s1);
-        scanf("%s", f1);
+        cin>>s1>>f1;
         for(int i = 0 ; i < q; i++){
-            scanf("%d", &a[i]);
-            scanf("%d", &b[i]);
+            cin>>a[i];
+            cin>>b[i];
         }
 
         int index = 1;
         int s = 0;
         int e = n-1;
-        memset(tree, 0, sizeof(tree));
-        memset(lazy, -1, sizeof(lazy));
+
+        for(int i = 0 ; i < (4*n+2); i++){
+            lazy[i] = -1;
+            tree[i] = 0;
+        }
+
         buildtree(index, s, e);
 
         bool flag = 0;
         for(int i = q-1; i > -1; i--){
+            //cout<<"updated: "<<query(index, s, e, s, e)<<endl;
             int l = a[i]-1;
             int r = b[i]-1;
-            int num = r-l+1;
-            int ones = query(index, s, e, l, r);
-            int zeros = num - ones;
+            ll num = r-l+1;
+            ll ones = query(index, s, e, l, r);
+            ll zeros = num - ones;
             //cout<<l<<" "<<r<<" "<<num<<" "<<ones<<endl;
             num /= 2;
             if(ones > num){
+                //cout<<"ones are more"<<endl;
                 update(index, s, e, l, r, 1);
             }
             else if(zeros > num){
+                //cout<<"zeros are more"<<endl;
                 update(index, s, e, l, r, 0);
             }
             else{
                 flag = 1;
                 break;
+            }
+        }
+
+        //check s1 == f1
+        if(flag == 0){
+            for(int i = 0; i < s1.size() ; i++){
+                if(query(index, s, e, i, i) != (ll)(s1[i] - '0')){
+                    flag = 1;
+                    break;
+                }
             }
         }
 
