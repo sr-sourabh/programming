@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Institute xmlns="http://www.iiitb.ac.in">
+    <Course>
+        <Name>DBMS</Name>
+        <Enrollment>
+            <RollNo>MT12345678</RollNo>
+            <Term>SUMMER</Term>
+            <Year>1234</Year>
+        </Enrollment>
+    </Course>
+</Institute>

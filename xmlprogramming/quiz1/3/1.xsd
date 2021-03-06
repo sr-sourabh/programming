@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.iiitb.ac.in"
+            xmlns="http://www.iiitb.ac.in"
+            elementFormDefault="qualified"
+>
+    <xsd:element name="Institute">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="Course" maxOccurs="unbounded">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Name"/>
+                            <xsd:element name="Enrollment">
+                                <xsd:complexType>
+                                    <xsd:sequence>
+                                        <xsd:element name="RollNo"/>
+                                        <xsd:element name="Term">
+                                            <xsd:simpleType>
+                                                <xsd:restriction base="xsd:string">
+                                                    <xsd:enumeration value="SPRING"/>
+                                                    <xsd:enumeration value="FALL"/>
+                                                    <xsd:enumeration value="SUMMER"/>
+                                                </xsd:restriction>
+                                            </xsd:simpleType>
+                                        </xsd:element>
+                                        <xsd:element name="Year"/>
+                                    </xsd:sequence>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

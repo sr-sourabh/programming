@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.iiitb.ac.in"
+            xmlns="http://www.iiitb.ac.in"
+            elementFormDefault="qualified"
+>
+    <xsd:element name="juicers">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="juicer" maxOccurs="unbounded">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="name" minOccurs="0"/>
+                            <xsd:element name="image" minOccurs="0"/>
+                            <xsd:element name="description" minOccurs="0"/>
+                            <xsd:element name="warranty" minOccurs="0"/>
+                            <xsd:element name="weight" minOccurs="0"/>
+                            <xsd:element name="cost" minOccurs="0"/>
+                            <xsd:element name="retailer" minOccurs="0"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

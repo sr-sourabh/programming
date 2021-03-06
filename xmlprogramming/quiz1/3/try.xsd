@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.juicers.org"
+            xmlns="http://www.juicers.org"
+            elementFormDefault="qualified">
+    <xsd:element name="warranty" type="xsd:string"/>
+    <xsd:element name="guarantee" substitutionGroup="warranty" type="xsd:string"/>
+    <xsd:complexType name="appliance">
+        <xsd:sequence>
+            <xsd:element name="description" type="xsd:string"/>
+            <xsd:element ref="warranty" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="juiceAppliance">
+        <xsd:complexContent>
+            <xsd:extension base="appliance">
+                <xsd:sequence>
+                    <xsd:element name="name" type="xsd:string"/>
+                    <xsd:element name="image" type="imageType"/>
+                    <xsd:element name="weight" type="xsd:positiveInteger" minOccurs="0"/>
+                    <xsd:element name="cost" type="money" maxOccurs="unbounded"/>
+                    <xsd:element name="retailer" type="xsd:anyURI"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:element name="juicers">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="juicer" type="juiceAppliance" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:simpleType name="money">
+        <xsd:restriction base="xsd:decimal">
+            <xsd:fractionDigits value="2"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="imageType">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="(.)+\.(gif|jpg|jpeg|bmp)"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

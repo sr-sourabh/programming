@@ -1,0 +1,1 @@
+xmllint -noout -schema juicer.xsd juicer_valid.xml

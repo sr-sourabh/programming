@@ -1,5 +1,3 @@
-typedef long long ll;
-
 //max heap
 class binaryheap{
     public:
@@ -82,6 +80,4 @@ class binaryheap{
             }
 
         }
-
-
 };
